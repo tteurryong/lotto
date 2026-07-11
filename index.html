@@ -1,87 +1,133 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>순환 로또 추첨기</title>
+
 <style>
-body{font-family:Arial,sans-serif;background:#1d2330;color:#fff;text-align:center}
-#box{width:420px;height:260px;margin:20px auto;border:3px solid #888;border-radius:20px;position:relative;overflow:hidden;background:#2b3448}
-.ball{width:28px;height:28px;border-radius:50%;background:#ffd54f;color:#000;font-weight:bold;display:flex;align-items:center;justify-content:center;position:absolute}
-#result span{display:inline-flex;width:46px;height:46px;border-radius:50%;background:#4fc3f7;color:#000;font-weight:bold;align-items:center;justify-content:center;margin:4px;font-size:20px}
-button{padding:10px 20px;font-size:18px}
+body{
+    font-family: Arial;
+    text-align:center;
+    background:#f4f4f4;
+}
+
+button{
+    padding:12px 25px;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.ball{
+    display:inline-block;
+    width:50px;
+    height:50px;
+    line-height:50px;
+    border-radius:50%;
+    margin:5px;
+    color:white;
+    font-weight:bold;
+    font-size:20px;
+}
+
+#result{
+    margin-top:20px;
+}
+
+#info{
+    margin-top:20px;
+    font-size:18px;
+}
 </style>
+
 </head>
 <body>
-<h2>순환 로또 추첨기</h2>
-<div id="box"></div>
-<button id="draw">추첨 시작</button>
-<p>남은 공: <span id="remain"></span></p>
-<div id="result"></div>
-<script>
-let pool=[...Array(45)].map((_,i)=>i+1);
-let used=[];
-const box=document.getElementById('box');
-const remain=document.getElementById('remain');
-const result=document.getElementById('result');
 
-function refill(){
- if(pool.length<6){
-   pool=pool.concat(used);
-   used=[];
- }
+<h1>순환 로또 추첨기</h1>
+
+<button onclick="draw()">추첨하기</button>
+
+<div id="info"></div>
+
+<div id="result"></div>
+
+<script>
+
+let pool=[];
+let used=[];
+
+function resetPool(){
+
+    pool=[];
+
+    for(let i=1;i<=45;i++){
+        pool.push(i);
+    }
+
+    used=[];
+
 }
-function updateRemain(){remain.textContent=pool.length;}
-function renderBalls(){
- box.innerHTML="";
- for(let i=0;i<Math.min(pool.length,45);i++){
-   let b=document.createElement("div");
-   b.className="ball";
-   b.textContent=pool[i];
-   b.style.left=(20+Math.random()*360)+"px";
-   b.style.top=(20+Math.random()*200)+"px";
-   box.appendChild(b);
- }
+
+resetPool();
+
+function color(num){
+
+    if(num<=10) return "#fbc400";
+    if(num<=20) return "#4aa3ff";
+    if(num<=30) return "#ff5555";
+    if(num<=40) return "#999999";
+    return "#53b85a";
+
 }
-function animate(ms){
- return new Promise(res=>{
-   let start=performance.now();
-   function f(t){
-    document.querySelectorAll(".ball").forEach(e=>{
-      e.style.left=(20+Math.random()*360)+"px";
-      e.style.top=(20+Math.random()*200)+"px";
+
+function draw(){
+
+    // 6개 미만이면 다시 채우기
+    if(pool.length<6){
+
+        pool=pool.concat(used);
+
+        used=[];
+
+        alert("공이 부족하여 다시 45개로 채웠습니다.");
+
+    }
+
+    let result=[];
+
+    for(let i=0;i<6;i++){
+
+        let index=Math.floor(Math.random()*pool.length);
+
+        let number=pool.splice(index,1)[0];
+
+        used.push(number);
+
+        result.push(number);
+
+    }
+
+    result.sort((a,b)=>a-b);
+
+    let html="";
+
+    result.forEach(n=>{
+
+        html+=`<div class="ball"
+        style="background:${color(n)}">${n}</div>`;
+
     });
-    if(t-start<ms) requestAnimationFrame(f); else res();
-   }
-   requestAnimationFrame(f);
- });
+
+    document.getElementById("result").innerHTML=html;
+
+    document.getElementById("info").innerHTML=
+    `
+    남은 공 : ${pool.length}개<br>
+    사용된 공 : ${used.length}개
+    `;
+
 }
-async function draw(){
- refill();
- updateRemain();
- renderBalls();
- await animate(2500);
- result.innerHTML="";
- let picks=[];
- for(let i=0;i<6;i++){
-   let idx=Math.floor(Math.random()*pool.length);
-   let n=pool.splice(idx,1)[0];
-   used.push(n);
-   picks.push(n);
- }
- picks.sort((a,b)=>a-b);
- for(const n of picks){
-   let s=document.createElement("span");
-   s.textContent=n;
-   result.appendChild(s);
-   await new Promise(r=>setTimeout(r,300));
- }
- updateRemain();
-}
-updateRemain();
-renderBalls();
-draw.onclick=draw;
+
 </script>
+
 </body>
 </html>
