@@ -1,133 +1,61 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>순환 로또 추첨기</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>45개 공 소진 로또</title>
 
-<style>
-body{
-    font-family: Arial;
-    text-align:center;
-    background:#f4f4f4;
-}
-
-button{
-    padding:12px 25px;
-    font-size:20px;
-    cursor:pointer;
-}
-
-.ball{
-    display:inline-block;
-    width:50px;
-    height:50px;
-    line-height:50px;
-    border-radius:50%;
-    margin:5px;
-    color:white;
-    font-weight:bold;
-    font-size:20px;
-}
-
-#result{
-    margin-top:20px;
-}
-
-#info{
-    margin-top:20px;
-    font-size:18px;
-}
-</style>
-
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h1>순환 로또 추첨기</h1>
+<h1>🎱 45개 공 소진 로또</h1>
 
-<button onclick="draw()">추첨하기</button>
+<!-- 움직이는 공 -->
+<div id="machine">
+    <canvas id="canvas" width="700" height="250"></canvas>
+</div>
 
-<div id="info"></div>
+<div class="panel">
+
+    <button id="drawBtn">🎲 추첨하기</button>
+
+    <button id="resetBtn">🔄 새 게임</button>
+
+</div>
+
+<div id="info">
+
+    <h2>현재 상태</h2>
+
+    <p>
+        회차 :
+        <span id="round">1</span>
+        /
+        8
+    </p>
+
+    <p>
+        남은 공 :
+        <span id="remain">45</span>개
+    </p>
+
+</div>
+
+<hr>
+
+<h2>이번 추첨</h2>
 
 <div id="result"></div>
 
-<script>
+<hr>
 
-let pool=[];
-let used=[];
+<h2>추첨 기록</h2>
 
-function resetPool(){
+<div id="history"></div>
 
-    pool=[];
-
-    for(let i=1;i<=45;i++){
-        pool.push(i);
-    }
-
-    used=[];
-
-}
-
-resetPool();
-
-function color(num){
-
-    if(num<=10) return "#fbc400";
-    if(num<=20) return "#4aa3ff";
-    if(num<=30) return "#ff5555";
-    if(num<=40) return "#999999";
-    return "#53b85a";
-
-}
-
-function draw(){
-
-    // 6개 미만이면 다시 채우기
-    if(pool.length<6){
-
-        pool=pool.concat(used);
-
-        used=[];
-
-        alert("공이 부족하여 다시 45개로 채웠습니다.");
-
-    }
-
-    let result=[];
-
-    for(let i=0;i<6;i++){
-
-        let index=Math.floor(Math.random()*pool.length);
-
-        let number=pool.splice(index,1)[0];
-
-        used.push(number);
-
-        result.push(number);
-
-    }
-
-    result.sort((a,b)=>a-b);
-
-    let html="";
-
-    result.forEach(n=>{
-
-        html+=`<div class="ball"
-        style="background:${color(n)}">${n}</div>`;
-
-    });
-
-    document.getElementById("result").innerHTML=html;
-
-    document.getElementById("info").innerHTML=
-    `
-    남은 공 : ${pool.length}개<br>
-    사용된 공 : ${used.length}개
-    `;
-
-}
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
